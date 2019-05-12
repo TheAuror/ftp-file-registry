@@ -1,25 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Win32;
 
 namespace WinContextMenu
 {
     public static class ContextMenuRegister
     {
-        public const string CommandName = "Register to FTP";
+        private const string CommandName = "Register to FTP";
+        private static readonly List<string> SupportedExtensions = 
+            new List<string> {".rar", ".zip"};
 
         public static bool Register()
         {
-            UnregisterForRar();
-            return RegisterForRar();
+            var successfulRegistration = true;
+
+            foreach (var extension in SupportedExtensions)
+            {
+                UnregisterForExtension(extension);
+                successfulRegistration &= RegisterForExtension(extension);
+            }
+
+            return successfulRegistration;
         }
 
-        private static void UnregisterForRar()
+        private static void UnregisterForExtension(string extension)
         {
-            var registryKey = Registry.ClassesRoot.OpenSubKey(".rar");
+            var registryKey = Registry.ClassesRoot.OpenSubKey(extension);
             var rarHandlerKey = registryKey?.GetValue(string.Empty) as string;
 
             if (rarHandlerKey == null) return;
@@ -37,10 +43,10 @@ namespace WinContextMenu
             }
         }
 
-        private static bool RegisterForRar()
+        private static bool RegisterForExtension(string extension)
         {
             var applicationPath = System.Reflection.Assembly.GetEntryAssembly()?.Location;
-            var registryKey = Registry.ClassesRoot.OpenSubKey(".rar");
+            var registryKey = Registry.ClassesRoot.OpenSubKey(extension);
             var rarHandlerKey = registryKey?.GetValue(string.Empty) as string;
 
             if (string.IsNullOrEmpty(rarHandlerKey)) return false;
