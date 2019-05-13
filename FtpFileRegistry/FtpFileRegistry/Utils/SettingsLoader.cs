@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -13,10 +15,19 @@ namespace FtpFileRegistry.Utils
     {
         public static void SaveSettings(SettingsModel settings)
         {
+
             foreach (var property in typeof(SettingsModel).GetProperties())
             {
-                Settings.Default[property.Name] = (string) property.GetValue(settings);
+                var settingsProperty = Settings.Default.Properties[property.Name];
+                if(settingsProperty == null)
+                    CreateSettingsProperty(property.Name);
+
+                settingsProperty = Settings.Default.Properties[property.Name];
+                if (settingsProperty != null)
+                    settingsProperty.DefaultValue = (string) property.GetValue(settings);
             }
+            Settings.Default.Save();
+            Settings.Default.Reload();
         }
 
         public static SettingsModel LoadSettings()
@@ -24,10 +35,25 @@ namespace FtpFileRegistry.Utils
             var settings = new SettingsModel();
             foreach (var property in typeof(SettingsModel).GetProperties())
             {
-                property.SetValue(settings, Settings.Default[property.Name]);
+                property.SetValue(settings, Settings.Default.Properties[property.Name]?.DefaultValue);
             }
 
             return settings;
+        }
+
+        public static void CreateSettingsProperty(string name)
+        {
+            var property = new SettingsProperty(name)
+            {
+                DefaultValue = "",
+                IsReadOnly = false,
+                PropertyType = typeof(string),
+                Provider = Settings.Default.Providers["LocalFileSettingsProvider"]
+            };
+            property.Attributes.Add(typeof(UserScopedSettingAttribute), new UserScopedSettingAttribute());
+            Settings.Default.Properties.Add(property);
+
+            Settings.Default.Reload();
         }
     }
 }

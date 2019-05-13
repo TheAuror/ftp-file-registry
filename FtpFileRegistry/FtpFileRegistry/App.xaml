@@ -6,6 +6,6 @@
              StartupUri="Views/SettingsWindow.xaml"
              Startup="Application_Startup">
     <Application.Resources>
-        <properties:Settings x:Key="Settings" />
+        <properties:Settings x:Key="Settings"/>
     </Application.Resources>
 </Application>

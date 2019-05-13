@@ -45,6 +45,7 @@ namespace FtpFileRegistry.Workers
 
         private void BackgroundWorkerOnRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs args)
         {
+            new Uploader((string) args.Result).Start();
             _backgroundWorker.RunWorkerAsync();
         }
     }

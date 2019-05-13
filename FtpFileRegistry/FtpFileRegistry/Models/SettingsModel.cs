@@ -10,6 +10,6 @@ namespace FtpFileRegistry.Models
     {
         public string FtpUsername { get; set; }
         public string FtpPassword { get; set; }
-        public string FtpPath { get; set; }
+        public string FtpTargetPath { get; set; }
     }
 }

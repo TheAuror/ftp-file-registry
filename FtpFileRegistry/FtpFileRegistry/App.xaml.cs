@@ -3,6 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Windows;
+using FtpFileRegistry.Models;
+using FtpFileRegistry.Utils;
+using FtpFileRegistry.Workers;
 using WinContextMenu;
 
 namespace FtpFileRegistry
@@ -22,6 +25,15 @@ namespace FtpFileRegistry
             }
 
             ContextMenuRegister.Register();
+
+            #if DEBUG
+                SettingsLoader.SaveSettings(new SettingsModel
+                {
+                    FtpUsername = "test",
+                    FtpPassword = "test",
+                    FtpTargetPath = "ftp://localhost"
+                });
+            #endif
         }
 
         private static void MessageRunningProcess(string filePath)

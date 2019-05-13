@@ -11,7 +11,6 @@ namespace FtpFileRegistry.Views
         {
             InitializeComponent();
             SubscribeForEvents();
-            
             Hide();
 
             new Listener().Start();
