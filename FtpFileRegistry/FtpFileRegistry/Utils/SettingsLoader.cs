@@ -15,45 +15,49 @@ namespace FtpFileRegistry.Utils
     {
         public static void SaveSettings(SettingsModel settings)
         {
-
+            CreateSettingsProperties();
             foreach (var property in typeof(SettingsModel).GetProperties())
             {
                 var settingsProperty = Settings.Default.Properties[property.Name];
-                if(settingsProperty == null)
-                    CreateSettingsProperty(property.Name);
-
-                settingsProperty = Settings.Default.Properties[property.Name];
                 if (settingsProperty != null)
                     settingsProperty.DefaultValue = (string) property.GetValue(settings);
             }
             Settings.Default.Save();
-            Settings.Default.Reload();
         }
 
-        public static SettingsModel LoadSettings()
+        public static SettingsModel LoadSettings(SettingsModel settingsModel = null)
         {
-            var settings = new SettingsModel();
+            CreateSettingsProperties();
+            if (settingsModel == null)
+                settingsModel = new SettingsModel();
+
             foreach (var property in typeof(SettingsModel).GetProperties())
             {
-                property.SetValue(settings, Settings.Default.Properties[property.Name]?.DefaultValue);
+                property.SetValue(settingsModel, Settings.Default.Properties[property.Name]?.DefaultValue);
             }
 
-            return settings;
+            return settingsModel;
         }
 
-        public static void CreateSettingsProperty(string name)
+        private static void CreateSettingsProperties()
+        {
+            foreach (var property in typeof(SettingsModel).GetProperties())
+            {
+                var settingsProperty = Settings.Default.Properties[property.Name];
+                if (settingsProperty == null)
+                    CreateSettingsProperty(property.Name);
+            }
+        }
+
+        private static void CreateSettingsProperty(string name)
         {
             var property = new SettingsProperty(name)
             {
-                DefaultValue = "",
-                IsReadOnly = false,
                 PropertyType = typeof(string),
                 Provider = Settings.Default.Providers["LocalFileSettingsProvider"]
             };
             property.Attributes.Add(typeof(UserScopedSettingAttribute), new UserScopedSettingAttribute());
             Settings.Default.Properties.Add(property);
-
-            Settings.Default.Reload();
         }
     }
 }
