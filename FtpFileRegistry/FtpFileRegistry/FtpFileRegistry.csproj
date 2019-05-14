@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Icons\ftp_folder.ico</ApplicationIcon>
+    <ApplicationIcon>Images\ftp_folder.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Hardcodet.Wpf.TaskbarNotification, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
@@ -69,8 +69,9 @@
       <DependentUpon>ProgressControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helpers\PasswordHelper.cs" />
-    <Compile Include="Views\ProgressWindow.xaml.cs">
-      <DependentUpon>ProgressWindow.xaml</DependentUpon>
+    <Compile Include="ViewModels\ProgressViewModel.cs" />
+    <Compile Include="Views\ProgressView.xaml.cs">
+      <DependentUpon>ProgressView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Workers\Listener.cs" />
     <Compile Include="Utils\SettingsLoader.cs" />
@@ -79,11 +80,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ProgressWindow.xaml">
+    <Page Include="Views\ProgressView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SettingsWindow.xaml">
+    <Page Include="Views\SettingsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -91,8 +92,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Views\SettingsWindow.xaml.cs">
-      <DependentUpon>SettingsWindow.xaml</DependentUpon>
+    <Compile Include="Views\SettingsView.xaml.cs">
+      <DependentUpon>SettingsView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="ResourceDictionary.xaml">
@@ -129,13 +130,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Icons\bulb.ico" />
+    <Resource Include="Images\bulb.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Icons\cloud.ico" />
+    <Resource Include="Images\cloud.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Icons\ftp_folder.ico" />
+    <Resource Include="Images\ftp_folder.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WinContextMenu\WinContextMenu.csproj">
@@ -144,14 +145,20 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Icons\Delacro-Folder-Folder-Blank.ico" />
-    <Resource Include="Icons\Delacro-Folder-Folder-Book.ico" />
-    <Resource Include="Icons\Delacro-Folder-Folder-Documents.ico" />
-    <Resource Include="Icons\Delacro-Folder-Folder-Download.ico" />
-    <Resource Include="Icons\Delacro-Folder-Folder-Option.ico" />
-    <Resource Include="Icons\Delacro-Folder-Folder-System.ico" />
-    <Resource Include="Icons\Delacro-Folder-Folder-Upload.ico" />
-    <Resource Include="Icons\Delacro-Folder-Folder-Windows.ico" />
+    <Resource Include="Images\Delacro-Folder-Folder-Blank.ico" />
+    <Resource Include="Images\Delacro-Folder-Folder-Book.ico" />
+    <Resource Include="Images\Delacro-Folder-Folder-Documents.ico" />
+    <Resource Include="Images\Delacro-Folder-Folder-Download.ico" />
+    <Resource Include="Images\Settings.ico" />
+    <Resource Include="Images\Delacro-Folder-Folder-System.ico" />
+    <Resource Include="Images\Delacro-Folder-Folder-Upload.ico" />
+    <Resource Include="Images\Delacro-Folder-Folder-Windows.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\background.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\settingsBackground.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

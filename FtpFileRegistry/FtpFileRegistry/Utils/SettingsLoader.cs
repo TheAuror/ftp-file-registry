@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Xml.Serialization;
 using FtpFileRegistry.Models;
 using FtpFileRegistry.Properties;
 
@@ -13,51 +16,26 @@ namespace FtpFileRegistry.Utils
 {
     public static class SettingsLoader
     {
+        private static readonly string SettingsLocation = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.xml");
+
         public static void SaveSettings(SettingsModel settings)
         {
-            CreateSettingsProperties();
-            foreach (var property in typeof(SettingsModel).GetProperties())
+            using (var streamWriter = new StreamWriter(SettingsLocation))
             {
-                var settingsProperty = Settings.Default.Properties[property.Name];
-                if (settingsProperty != null)
-                    settingsProperty.DefaultValue = (string) property.GetValue(settings);
+                var serializer = new XmlSerializer(typeof(SettingsModel));
+                serializer.Serialize(streamWriter, settings);
             }
-            Settings.Default.Save();
         }
 
         public static SettingsModel LoadSettings(SettingsModel settingsModel = null)
         {
-            CreateSettingsProperties();
-            if (settingsModel == null)
-                settingsModel = new SettingsModel();
-
-            foreach (var property in typeof(SettingsModel).GetProperties())
+            if(!File.Exists(SettingsLocation))
+                SaveSettings(new SettingsModel());
+            using (var streamReader = new StreamReader(SettingsLocation))
             {
-                property.SetValue(settingsModel, Settings.Default.Properties[property.Name]?.DefaultValue);
+                var serializer = new XmlSerializer(typeof(SettingsModel));
+                return serializer.Deserialize(streamReader) as SettingsModel;
             }
-
-            return settingsModel;
-        }
-
-        private static void CreateSettingsProperties()
-        {
-            foreach (var property in typeof(SettingsModel).GetProperties())
-            {
-                var settingsProperty = Settings.Default.Properties[property.Name];
-                if (settingsProperty == null)
-                    CreateSettingsProperty(property.Name);
-            }
-        }
-
-        private static void CreateSettingsProperty(string name)
-        {
-            var property = new SettingsProperty(name)
-            {
-                PropertyType = typeof(string),
-                Provider = Settings.Default.Providers["LocalFileSettingsProvider"]
-            };
-            property.Attributes.Add(typeof(UserScopedSettingAttribute), new UserScopedSettingAttribute());
-            Settings.Default.Properties.Add(property);
         }
     }
 }

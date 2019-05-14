@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.IO;
 using System.Net;
+using FtpFileRegistry.Models;
+using FtpFileRegistry.Properties;
 using FtpFileRegistry.Utils;
 
 namespace FtpFileRegistry.Workers
@@ -29,21 +31,18 @@ namespace FtpFileRegistry.Workers
         {
             try
             {
-                var settings = SettingsLoader.LoadSettings();
-                var file = new FileInfo(_localFullPath);
-                var ftpRequest = (FtpWebRequest)WebRequest.Create(settings.FtpTargetPath + "//" + file.Name);
-                ftpRequest.Credentials = new NetworkCredential(settings.FtpUsername, settings.FtpPassword);
-                ftpRequest.KeepAlive = false;
-                ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
+                var worker = (BackgroundWorker) sender;
+                var ftpRequest = CreateFtpRequest();
                 var ftpStream = ftpRequest.GetRequestStream();
 
                 using (Stream source = File.OpenRead(_localFullPath))
                 {
                     var buffer = new byte[2048];
                     int bytesRead;
+                    long progress = 0;
                     while ((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0)
                     {
-                        if (e.Cancel)
+                        if (worker.CancellationPending)
                         {
                             e.Result = Result.Cancelled;
                             ftpStream.Close();
@@ -52,6 +51,8 @@ namespace FtpFileRegistry.Workers
                         }
 
                         ftpStream.Write(buffer, 0, bytesRead);
+                        progress += bytesRead;
+                        worker.ReportProgress((int) (progress / source.Length * 100));
                     }
                 }
 
@@ -74,6 +75,19 @@ namespace FtpFileRegistry.Workers
         {
             return;
             throw new NotImplementedException();
+        }
+
+        private FtpWebRequest CreateFtpRequest()
+        {
+            var file = new FileInfo(_localFullPath);
+            var settings = SettingsLoader.LoadSettings();
+            var ftpRequest = (FtpWebRequest)WebRequest.Create(settings.FtpTargetPath + "//" + file.Name);
+
+            ftpRequest.Credentials = new NetworkCredential(settings.FtpUsername, settings.FtpPassword);
+            ftpRequest.KeepAlive = false;
+            ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
+
+            return ftpRequest;
         }
     }
 }
