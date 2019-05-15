@@ -41,6 +41,6 @@
         <Label Foreground="FloralWhite" Content="Ftp Username:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
         <Label Foreground="FloralWhite" Content="Ftp Password:" HorizontalAlignment="Left" Margin="226,10,0,0" VerticalAlignment="Top"/>
         <Label Foreground="FloralWhite" Content="Ftp Folder:" HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.494,-1.923" Width="86"/>
-        <TextBox Text = "{Binding FtpTargetPath, Mode = TwoWay}" HorizontalAlignment="Left" Height="23" Margin="101,44,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="333"/>
+        <TextBox Name="FtpPathTextBox" Text = "{Binding FtpTargetPath, Mode = TwoWay}" HorizontalAlignment="Left" Height="23" Margin="101,44,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="333"/>
     </Grid>
 </Window>

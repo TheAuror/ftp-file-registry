@@ -19,14 +19,16 @@ namespace FtpFileRegistry
 
             if (isAlreadyRunning)
             {
-                MessageBox.Show(e.Args[0]);
                 if (e.Args.Length == 0) return;
                 MessageRunningProcess(e.Args.ElementAt(0));
                 Process.GetCurrentProcess().Kill();
             }
             ContextMenuRegister.Register();
             UriRegister.Register();
-            LedgerManager.LoadLedger();
+
+            var settings = SettingsLoader.LoadSettings();
+            if(!string.IsNullOrEmpty(settings.FtpTargetPath))
+                LedgerManager.LoadLedger();
         }
 
         private static void MessageRunningProcess(string filePath)

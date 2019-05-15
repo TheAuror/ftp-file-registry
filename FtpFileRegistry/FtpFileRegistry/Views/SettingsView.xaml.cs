@@ -53,6 +53,7 @@ namespace FtpFileRegistry.Views
 
         private void Save(object sender, RoutedEventArgs e)
         {
+            _settingsModel.FtpTargetPath = FtpPathTextBox.Text;
             SettingsLoader.SaveSettings(_settingsModel);
             Hide();
         }
