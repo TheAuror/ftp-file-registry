@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 
 namespace FtpFileRegistry.Helpers
@@ -54,41 +49,39 @@ namespace FtpFileRegistry.Helpers
             dp.SetValue(IsUpdatingProperty, value);
         }
 
-        private static void OnPasswordPropertyChanged(DependencyObject sender,
-            DependencyPropertyChangedEventArgs e)
+        private static void OnPasswordPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            PasswordBox passwordBox = sender as PasswordBox;
+            var passwordBox = sender as PasswordBox;
+            if (passwordBox == null) return;
+
             passwordBox.PasswordChanged -= PasswordChanged;
 
-            if (!(bool)GetIsUpdating(passwordBox))
+            if (!GetIsUpdating(passwordBox))
             {
                 passwordBox.Password = (string)e.NewValue;
             }
             passwordBox.PasswordChanged += PasswordChanged;
         }
 
-        private static void Attach(DependencyObject sender,
-            DependencyPropertyChangedEventArgs e)
+        private static void Attach(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            PasswordBox passwordBox = sender as PasswordBox;
+            var passwordBox = sender as PasswordBox;
 
             if (passwordBox == null)
                 return;
 
-            if ((bool)e.OldValue)
-            {
+            if ((bool) e.OldValue)
                 passwordBox.PasswordChanged -= PasswordChanged;
-            }
 
-            if ((bool)e.NewValue)
-            {
+            if ((bool) e.NewValue)
                 passwordBox.PasswordChanged += PasswordChanged;
-            }
         }
 
         private static void PasswordChanged(object sender, RoutedEventArgs e)
         {
-            PasswordBox passwordBox = sender as PasswordBox;
+            var passwordBox = sender as PasswordBox;
+            if (passwordBox == null) return;
+
             SetIsUpdating(passwordBox, true);
             SetPassword(passwordBox, passwordBox.Password);
             SetIsUpdating(passwordBox, false);

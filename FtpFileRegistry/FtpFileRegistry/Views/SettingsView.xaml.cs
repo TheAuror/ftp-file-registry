@@ -1,24 +1,22 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
 using FtpFileRegistry.Models;
 using FtpFileRegistry.Utils;
 using FtpFileRegistry.Workers;
 
 namespace FtpFileRegistry.Views
 {
-    public partial class SettingsWindow
+    public partial class SettingsView
     {
         private readonly SettingsModel _settingsModel = SettingsLoader.LoadSettings();
 
-        public SettingsWindow()
+        public SettingsView()
         {
             InitializeComponent();
             SubscribeForEvents();
             DataContext = _settingsModel;
             Hide();
-            new Listener().Start();
+            new ContextMenuListener().Start();
         }
 
         private void SubscribeForEvents()

@@ -6,14 +6,14 @@ using System.Threading;
 
 namespace FtpFileRegistry.Workers
 {
-    public class Listener
+    public class ContextMenuListener
     {
         private readonly BackgroundWorker _backgroundWorker = new BackgroundWorker();
         private readonly TcpListener _listener = new TcpListener(
                 IPAddress.Loopback,
                 Properties.Settings.Default.Port);
 
-        public Listener()
+        public ContextMenuListener()
         {
             _backgroundWorker.DoWork += BackgroundWorkerOnDoWork;
             _backgroundWorker.RunWorkerCompleted += BackgroundWorkerOnRunWorkerCompleted;

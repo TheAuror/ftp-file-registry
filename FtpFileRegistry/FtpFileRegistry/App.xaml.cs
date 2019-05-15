@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Windows;
 using FtpFileRegistry.Properties;
+using FtpFileRegistry.Utils;
 using WinContextMenu;
 
 namespace FtpFileRegistry
@@ -23,6 +24,8 @@ namespace FtpFileRegistry
                 Process.GetCurrentProcess().Kill();
             }
             ContextMenuRegister.Register();
+
+            LedgerManager.LoadLedger();
         }
 
         private static void MessageRunningProcess(string filePath)

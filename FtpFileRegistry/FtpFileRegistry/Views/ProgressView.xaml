@@ -4,8 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FtpFileRegistry.Views"
-        xmlns:Controls="clr-namespace:FtpFileRegistry.Controls" x:Class="FtpFileRegistry.Views.ProgressWindow"
+        xmlns:Controls="clr-namespace:FtpFileRegistry.Controls" x:Class="FtpFileRegistry.Views.ProgressView"
         mc:Ignorable="d"
-        Title="ProgressWindow" Height="450" Width="800">
-    <Grid Name="Grid"/>
+        Title="ProgressView" Height="450" Width="800"
+        SizeToContent="WidthAndHeight"
+        WindowStyle="None"
+        ResizeMode="NoResize">
+    <StackPanel Name="StackPanel" Orientation="Vertical">
+        <StackPanel.Background>
+            <ImageBrush ImageSource="../Images/background.png" Stretch="UniformToFill"/>
+        </StackPanel.Background>
+    </StackPanel>
 </Window>

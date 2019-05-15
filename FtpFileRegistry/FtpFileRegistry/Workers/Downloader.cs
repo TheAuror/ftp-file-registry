@@ -3,31 +3,29 @@ using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Windows;
-using FtpFileRegistry.Helpers;
 using FtpFileRegistry.Models;
 using FtpFileRegistry.Utils;
 
 namespace FtpFileRegistry.Workers
 {
-    public class Uploader : WorkerWithProgress
+    public class Downloader : WorkerWithProgress
     {
-        private readonly string _localFullPath;
-        private readonly bool _storeInLedger;
+        private readonly string _localFolderPath;
+        private readonly string _ftpFullPath;
         private readonly BackgroundWorker _backgroundWorker = new BackgroundWorker();
         public enum Result { InProgress, Error, Success, Cancelled }
-        public Result UploadResult = Result.InProgress;
+        public Result DownloadResult = Result.InProgress;
 
-        public Uploader(string localFullPath, bool storeInLedger = true)
+        public Downloader(string localFolderPath, string ftpFullPath)
         {
-            _localFullPath = localFullPath;
-            _storeInLedger = storeInLedger;
+            _localFolderPath = localFolderPath;
+            _ftpFullPath = ftpFullPath;
             _backgroundWorker.DoWork += BackgroundWorkerOnDoWork;
             _backgroundWorker.ProgressChanged += BackgroundWorkerOnProgressChanged;
             _backgroundWorker.RunWorkerCompleted += BackgroundWorkerOnRunWorkerCompleted;
             _backgroundWorker.WorkerReportsProgress = true;
 
-            FileInfo file = new FileInfo(localFullPath);
-            ProgressModel.ProgressName = "Uploading " + file.Name.Substring(0, Math.Min(file.Name.Length, 20));
+            ProgressModel.ProgressName = "Downloading";
             CreateProgress();
         }
 
@@ -40,16 +38,17 @@ namespace FtpFileRegistry.Workers
         {
             try
             {
-                var worker = (BackgroundWorker) sender;
+                var worker = (BackgroundWorker)sender;
                 var ftpRequest = CreateFtpRequest();
-                var ftpStream = ftpRequest.GetRequestStream();
-
-                using (Stream fileStream = File.OpenRead(_localFullPath))
+                using (var ftpStream = ftpRequest.GetResponse().GetResponseStream())
+                using (Stream fileStream = File.OpenWrite(Path.Combine(_localFolderPath, Path.GetFileName(_ftpFullPath))))
                 {
-                    var buffer = new byte[1024*1024*2];
+                    var buffer = new byte[1024 * 1024 * 2];
                     int bytesRead;
                     long progress = 0;
-                    while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
+                    double fileSize = ftpRequest.ContentLength;
+                    if (ftpStream == null) throw new Exception("ftpStream was null");
+                    while ((bytesRead = ftpStream.Read(buffer, 0, buffer.Length)) > 0)
                     {
                         if (worker.CancellationPending)
                         {
@@ -59,18 +58,15 @@ namespace FtpFileRegistry.Workers
                             return;
                         }
 
-                        ftpStream.Write(buffer, 0, bytesRead);
+                        fileStream.Write(buffer, 0, bytesRead);
                         progress += bytesRead;
-                        var percentProgress = (int) ((double)progress / fileStream.Length * 100);
+                        var percentProgress = (int)(progress / fileSize * 100);
                         worker.ReportProgress(percentProgress);
                     }
+                    e.Result = Result.Success;
                 }
-
-                ftpStream.Close();
-                ftpStream.Dispose();
-                e.Result = Result.Success;
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 e.Result = exception;
             }
@@ -89,27 +85,27 @@ namespace FtpFileRegistry.Workers
         {
             if (e.Result is Result)
             {
-                var result = (Result) (e.Result ?? Result.Error);
+                var result = (Result)(e.Result ?? Result.Error);
                 if (result == Result.Success)
                 {
                     ProgressModel.Status = ProgressModel.ProgressStatus.Complete;
                     ProgressModel.Progress = 100;
                     ProgressModel.ProgressName = "Complete";
                 }
-                if(_storeInLedger)
-                    UpdateLedger();
-                UploadResult = Result.Success;
+                DownloadResult = Result.Success;
             }
             var exception = e.Result as WebException;
             if (exception != null)
             {
-                var messageBoxText = ((FtpWebResponse) exception.Response).StatusDescription;
+                var messageBoxText = ((FtpWebResponse)exception.Response).StatusDescription;
                 if (messageBoxText != null)
+                {
                     MessageBox.Show(messageBoxText, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
                 ProgressModel.Status = ProgressModel.ProgressStatus.Cancelled;
                 ProgressModel.Progress = 100;
                 ProgressModel.ProgressName = "Error";
-                UploadResult = Result.Error;
+                DownloadResult = Result.Error;
             }
 
             UpdateProgress();
@@ -117,31 +113,14 @@ namespace FtpFileRegistry.Workers
 
         private FtpWebRequest CreateFtpRequest()
         {
-            var file = new FileInfo(_localFullPath);
             var settings = SettingsLoader.LoadSettings();
-            var ftpRequest = (FtpWebRequest)WebRequest.Create(settings.FtpTargetPath + "//" + file.Name);
+            var ftpRequest = (FtpWebRequest)WebRequest.Create(_ftpFullPath);
 
             ftpRequest.Credentials = new NetworkCredential(settings.FtpUsername, settings.FtpPassword);
             ftpRequest.KeepAlive = false;
-            ftpRequest.Method = WebRequestMethods.Ftp.UploadFile;
+            ftpRequest.Method = WebRequestMethods.Ftp.DownloadFile;
 
             return ftpRequest;
-        }
-
-        private void UpdateLedger()
-        {
-            FileInfo file = new FileInfo(_localFullPath);
-            var settings = SettingsLoader.LoadSettings();
-            var ledgerRowModel = new LedgerRowModel
-            {
-                UploadDateTime = DateTime.Now,
-                FileIdentifier = FileIdGenerator.GetIdentifier(),
-                FileName = file.Name,
-                LastDownloadDateTime = DateTime.MinValue,
-                Username = settings.FtpUsername
-            };
-            LedgerManager.GetManager().AddDatabaseToLedger(ledgerRowModel);
-            LedgerManager.SaveLedger();
         }
     }
 }

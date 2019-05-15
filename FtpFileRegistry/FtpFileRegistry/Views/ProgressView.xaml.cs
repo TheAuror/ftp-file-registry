@@ -1,31 +1,69 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using FtpFileRegistry.Controls;
+using FtpFileRegistry.Models;
+using FtpFileRegistry.ViewModels;
 
 namespace FtpFileRegistry.Views
 {
-    public partial class ProgressWindow : Window
+    public partial class ProgressView
     {
-        private static Dictionary<BackgroundWorker, ProgressControl> _progressControls = new Dictionary<BackgroundWorker, ProgressControl>();
-        private static ProgressWindow _instance;
+        public ProgressViewModel ViewModel { get; }
+        public Dictionary<ProgressModel, ProgressControl> ProgressLedger;
 
-        public ProgressWindow()
+        public ProgressView()
         {
             InitializeComponent();
-            _instance = this;
+            ProgressLedger = new Dictionary<ProgressModel, ProgressControl>();
+            ViewModel = new ProgressViewModel();
+            Hide();
         }
 
+        public void CreateProgressControl(ProgressModel progressModel)
+        {
+            var progressControl = new ProgressControl(progressModel);
+            StackPanel.Children.Add(progressControl);
+            ProgressLedger.Add(progressModel, progressControl);
+            ResizeWindow();
+            RepositonWindow();
+            Show();
+        }
+
+        public void UpdateProgressControl(ProgressModel progressModel)
+        {
+            var progressControl = ProgressLedger[progressModel];
+            progressControl.UpdateProgress(progressModel);
+            if (progressModel.Status != ProgressModel.ProgressStatus.Running)
+            {
+                RemoveProgressControl(progressModel);
+            }
+        }
+
+        private void RemoveProgressControl(ProgressModel progressModel)
+        {
+            StackPanel.Children.Remove(ProgressLedger[progressModel]);
+            ProgressLedger.Remove(progressModel);
+            if (!ProgressLedger.Any())
+            {
+                Hide();
+                return;
+            }
+            ResizeWindow();
+            RepositonWindow();
+        }
+
+        private void RepositonWindow()
+        {
+            var desktopWorkingArea = SystemParameters.WorkArea;
+            Left = desktopWorkingArea.Right - Width;
+            Top = desktopWorkingArea.Bottom - Height;
+        }
+
+        private void ResizeWindow()
+        {
+            Width = 250;
+            Height = ProgressLedger.Count * 49;
+        }
     }
 }

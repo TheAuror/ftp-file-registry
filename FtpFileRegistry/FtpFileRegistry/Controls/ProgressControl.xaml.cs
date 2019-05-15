@@ -1,17 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using FtpFileRegistry.Models;
 
 namespace FtpFileRegistry.Controls
 {
@@ -20,14 +7,29 @@ namespace FtpFileRegistry.Controls
     /// </summary>
     public partial class ProgressControl
     {
-        public string LabelText { get; set; }
-        public int ProgressPercentage { get; set; }
-
-        public ProgressControl()
+        public ProgressModel ProgressModel;
+        private string _dots = "";
+        
+        public ProgressControl(ProgressModel progressModel)
         {
+            ProgressModel = progressModel;
             InitializeComponent();
-            ProgressBar.DataContext = ProgressPercentage;
-            ProgressLabel.DataContext = LabelText;
+            DataContext = ProgressModel;
+        }
+
+        public void UpdateProgress(ProgressModel progressModel)
+        {
+            ProgressModel = progressModel;
+            ProgressBar.Value = ProgressModel.Progress;
+            ProgressLabel.Content = ProgressModel.ProgressName+GetDots();
+        }
+
+        private string GetDots()
+        {
+            _dots += ".";
+            if (_dots == "....")
+                _dots = "";
+            return _dots;
         }
     }
 }
