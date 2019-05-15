@@ -16,7 +16,7 @@ namespace FtpFileRegistry.Views
             SubscribeForEvents();
             DataContext = _settingsModel;
             Hide();
-            new ContextMenuListener().Start();
+            new Listener().Start();
         }
 
         private void SubscribeForEvents()

@@ -63,6 +63,12 @@ namespace FtpFileRegistry.Utils
             }
         }
 
+        public static List<LedgerRowModel> GetLedger()
+        {
+            LoadLedger();
+            return _ledger;
+        }
+
         public static void SaveLedger(bool upload = true)
         {
             using (var streamWriter = new StreamWriter(LedgerLocation))

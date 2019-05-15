@@ -43,7 +43,7 @@ namespace FtpFileRegistry.Workers
                 var worker = (BackgroundWorker)sender;
                 var ftpRequest = CreateFtpRequest();
                 using (var ftpStream = ftpRequest.GetResponse().GetResponseStream())
-                using (Stream fileStream = File.OpenWrite(Path.Combine(_localFolderPath, Path.GetFileName(_ftpFullPath))))
+                using (Stream fileStream = File.Create(Path.Combine(_localFolderPath, Path.GetFileName(_ftpFullPath))))
                 {
                     var buffer = new byte[1024 * 1024 * 2];
                     int bytesRead;

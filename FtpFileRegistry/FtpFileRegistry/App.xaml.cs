@@ -19,6 +19,7 @@ namespace FtpFileRegistry
 
             if (isAlreadyRunning)
             {
+                MessageBox.Show(e.Args[0]);
                 if (e.Args.Length == 0) return;
                 MessageRunningProcess(e.Args.ElementAt(0));
                 Process.GetCurrentProcess().Kill();

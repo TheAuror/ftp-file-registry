@@ -86,7 +86,7 @@
     </Compile>
     <Compile Include="Workers\Downloader.cs" />
     <Compile Include="Workers\IWorkerWithProgress.cs" />
-    <Compile Include="Workers\ContextMenuListener.cs" />
+    <Compile Include="Workers\Listener.cs" />
     <Compile Include="Utils\SettingsLoader.cs" />
     <Compile Include="Workers\Uploader.cs" />
     <Page Include="Controls\ProgressControl.xaml">

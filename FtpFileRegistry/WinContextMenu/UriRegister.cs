@@ -26,12 +26,12 @@ namespace WinContextMenu
             var applicationPath = System.Reflection.Assembly.GetEntryAssembly()?.Location;
 
             var registryKey = Registry.ClassesRoot.CreateSubKey(UriName);
-            registryKey?.SetValue("URL Protocol", "");
+            registryKey?.SetValue("URL Protocol", string.Empty);
             registryKey = registryKey?
                 .CreateSubKey("shell")?
                 .CreateSubKey("open")?
                 .CreateSubKey("command");
-            registryKey?.SetValue("", applicationPath ?? "");
+            registryKey?.SetValue(string.Empty, "\"" + applicationPath + "\" \"%1\"");
         }
     }
 }
