@@ -12,14 +12,16 @@ namespace FtpFileRegistry.Workers
     {
         private readonly string _localFolderPath;
         private readonly string _ftpFullPath;
+        private readonly bool _storeInLedger;
         private readonly BackgroundWorker _backgroundWorker = new BackgroundWorker();
         public enum Result { InProgress, Error, Success, Cancelled }
         public Result DownloadResult = Result.InProgress;
 
-        public Downloader(string localFolderPath, string ftpFullPath)
+        public Downloader(string localFolderPath, string ftpFullPath, bool storeInLedger = true)
         {
             _localFolderPath = localFolderPath;
             _ftpFullPath = ftpFullPath;
+            _storeInLedger = storeInLedger;
             _backgroundWorker.DoWork += BackgroundWorkerOnDoWork;
             _backgroundWorker.ProgressChanged += BackgroundWorkerOnProgressChanged;
             _backgroundWorker.RunWorkerCompleted += BackgroundWorkerOnRunWorkerCompleted;
@@ -98,7 +100,7 @@ namespace FtpFileRegistry.Workers
             if (exception != null)
             {
                 var messageBoxText = ((FtpWebResponse)exception.Response).StatusDescription;
-                if (messageBoxText != null)
+                if (messageBoxText != null && _storeInLedger)
                 {
                     MessageBox.Show(messageBoxText, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }

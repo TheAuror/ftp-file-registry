@@ -24,7 +24,7 @@ namespace FtpFileRegistry
                 Process.GetCurrentProcess().Kill();
             }
             ContextMenuRegister.Register();
-
+            UriRegister.Register();
             LedgerManager.LoadLedger();
         }
 

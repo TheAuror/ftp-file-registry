@@ -42,7 +42,7 @@ namespace FtpFileRegistry.Utils
         public static void LoadLedger()
         {
             var settings = SettingsLoader.LoadSettings();
-            var downloader = new Downloader(AppDomain.CurrentDomain.BaseDirectory, settings.FtpTargetPath + "//" + LedgerFileName);
+            var downloader = new Downloader(AppDomain.CurrentDomain.BaseDirectory, settings.FtpTargetPath + "//" + LedgerFileName, false);
             var ledgerFile = new FileInfo(LedgerLocation);
 
             downloader.Start();
