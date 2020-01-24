@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FtpFileRegistry.Models;
 using FtpFileRegistry.Views;
-using FtpFileRegistry.Workers;
 
 namespace FtpFileRegistry.Utils
 {

@@ -1,6 +1,4 @@
-﻿using System.Security;
-
-namespace FtpFileRegistry.Models
+﻿namespace FtpFileRegistry.Models
 {
     public class SettingsModel
     {

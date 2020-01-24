@@ -52,17 +52,17 @@ namespace FtpFileRegistry.Workers
 
             if (result.StartsWith("ftpregistry:"))
             {
-                result = result.Split(':')[1];
+                result = result.Split(':')[1].Replace("/", "");
                 var ledger = LedgerManager.GetLedger();
                 var settings = SettingsLoader.LoadSettings();
 
                 var ledgerRowModel =
-                    ledger.FirstOrDefault(e => String.Equals(e.FileIdentifier, result,
+                    ledger.FirstOrDefault(e => string.Equals(e.FileIdentifier, result,
                         StringComparison.CurrentCultureIgnoreCase));
                 if (ledgerRowModel != null)
                 {
                     var ftpFullPath = settings.FtpTargetPath + "//" + ledgerRowModel.FileName;
-                    new Downloader("C://", ftpFullPath).Start();
+                    new Downloader("C://", ftpFullPath, true).Start();
                 }
             }
             else

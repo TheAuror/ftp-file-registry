@@ -1,16 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Xml.Serialization;
 using FtpFileRegistry.Models;
-using FtpFileRegistry.Properties;
 
 namespace FtpFileRegistry.Utils
 {

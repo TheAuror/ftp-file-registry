@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FtpFileRegistry.Models
+﻿namespace FtpFileRegistry.Models
 {
     public class ProgressModel
     {

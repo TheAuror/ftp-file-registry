@@ -44,7 +44,7 @@ namespace FtpFileRegistry.Workers
                 var ftpRequest = CreateFtpRequest();
                 var ftpStream = ftpRequest.GetRequestStream();
 
-                using (Stream fileStream = File.OpenRead(_localFullPath))
+                using (Stream fileStream = File.OpenRead(_localFullPath).WainUntilReady())
                 {
                     var buffer = new byte[1024*1024*2];
                     int bytesRead;

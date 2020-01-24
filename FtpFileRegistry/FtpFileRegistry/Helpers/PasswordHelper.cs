@@ -51,40 +51,38 @@ namespace FtpFileRegistry.Helpers
 
         private static void OnPasswordPropertyChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var passwordBox = sender as PasswordBox;
-            if (passwordBox == null) return;
-
-            passwordBox.PasswordChanged -= PasswordChanged;
-
-            if (!GetIsUpdating(passwordBox))
+            if (sender is PasswordBox passwordBox)
             {
-                passwordBox.Password = (string)e.NewValue;
+                passwordBox.PasswordChanged -= PasswordChanged;
+
+                if (!GetIsUpdating(passwordBox))
+                {
+                    passwordBox.Password = (string) e.NewValue;
+                }
+                passwordBox.PasswordChanged += PasswordChanged;
             }
-            passwordBox.PasswordChanged += PasswordChanged;
         }
 
         private static void Attach(DependencyObject sender, DependencyPropertyChangedEventArgs e)
         {
-            var passwordBox = sender as PasswordBox;
+            if (sender is PasswordBox passwordBox)
+            {
+                if ((bool) e.OldValue)
+                    passwordBox.PasswordChanged -= PasswordChanged;
 
-            if (passwordBox == null)
-                return;
-
-            if ((bool) e.OldValue)
-                passwordBox.PasswordChanged -= PasswordChanged;
-
-            if ((bool) e.NewValue)
-                passwordBox.PasswordChanged += PasswordChanged;
+                if ((bool) e.NewValue)
+                    passwordBox.PasswordChanged += PasswordChanged;
+            }
         }
 
         private static void PasswordChanged(object sender, RoutedEventArgs e)
         {
-            var passwordBox = sender as PasswordBox;
-            if (passwordBox == null) return;
-
-            SetIsUpdating(passwordBox, true);
-            SetPassword(passwordBox, passwordBox.Password);
-            SetIsUpdating(passwordBox, false);
+            if (sender is PasswordBox passwordBox)
+            {
+                SetIsUpdating(passwordBox, true);
+                SetPassword(passwordBox, passwordBox.Password);
+                SetIsUpdating(passwordBox, false);
+            }
         }
     }
 }

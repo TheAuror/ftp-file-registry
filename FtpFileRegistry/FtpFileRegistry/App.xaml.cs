@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Windows;
-using FtpFileRegistry.Properties;
 using FtpFileRegistry.Utils;
 using WinContextMenu;
 
@@ -20,9 +19,10 @@ namespace FtpFileRegistry
             if (isAlreadyRunning)
             {
                 if (e.Args.Length == 0) return;
-                MessageRunningProcess(e.Args.ElementAt(0));
+                NotifyRunningProcess(e.Args.ElementAt(0));
                 Process.GetCurrentProcess().Kill();
             }
+
             ContextMenuRegister.Register();
             UriRegister.Register();
 
@@ -31,7 +31,7 @@ namespace FtpFileRegistry
                 LedgerManager.LoadLedger();
         }
 
-        private static void MessageRunningProcess(string filePath)
+        private static void NotifyRunningProcess(string filePath)
         {
             var client = new TcpClient("localhost", 8889);
             using (var sw = new StreamWriter(client.GetStream()))

@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Net;
+using System.Threading;
 using System.Windows;
 using FtpFileRegistry.Models;
 using FtpFileRegistry.Utils;
@@ -28,7 +29,8 @@ namespace FtpFileRegistry.Workers
             _backgroundWorker.WorkerReportsProgress = true;
 
             ProgressModel.ProgressName = "Downloading";
-            CreateProgress();
+            if(storeInLedger)
+                CreateProgress();
         }
 
         public void Start()
@@ -42,8 +44,8 @@ namespace FtpFileRegistry.Workers
             {
                 var worker = (BackgroundWorker)sender;
                 var ftpRequest = CreateFtpRequest();
-                using (var ftpStream = ftpRequest.GetResponse().GetResponseStream())
-                using (Stream fileStream = File.Create(Path.Combine(_localFolderPath, Path.GetFileName(_ftpFullPath))))
+                using (var ftpStream = ftpRequest.GetResponse().GetResponseStream().WainUntilReady())
+                using (Stream fileStream = File.Create(Path.Combine(_localFolderPath, Path.GetFileName(_ftpFullPath))).WainUntilReady())
                 {
                     var buffer = new byte[1024 * 1024 * 2];
                     int bytesRead;
@@ -76,7 +78,7 @@ namespace FtpFileRegistry.Workers
 
         private void BackgroundWorkerOnProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            if (ProgressModel.Progress != e.ProgressPercentage)
+            if (ProgressModel.Progress != e.ProgressPercentage && _storeInLedger)
             {
                 ProgressModel.Progress = e.ProgressPercentage;
                 UpdateProgress();
@@ -96,8 +98,7 @@ namespace FtpFileRegistry.Workers
                 }
                 DownloadResult = Result.Success;
             }
-            var exception = e.Result as WebException;
-            if (exception != null)
+            if (e.Result is WebException exception)
             {
                 var messageBoxText = ((FtpWebResponse)exception.Response).StatusDescription;
                 if (messageBoxText != null && _storeInLedger)
@@ -110,7 +111,8 @@ namespace FtpFileRegistry.Workers
                 DownloadResult = Result.Error;
             }
 
-            UpdateProgress();
+            if(_storeInLedger)
+                UpdateProgress();
         }
 
         private FtpWebRequest CreateFtpRequest()
@@ -123,6 +125,16 @@ namespace FtpFileRegistry.Workers
             ftpRequest.Method = WebRequestMethods.Ftp.DownloadFile;
 
             return ftpRequest;
+        }
+    }
+
+    public static class Extensions
+    {
+        public static Stream WainUntilReady(this Stream stream)
+        {
+            while(!stream.CanRead)
+                Thread.Sleep(50);
+            return stream;
         }
     }
 }
